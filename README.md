@@ -100,6 +100,60 @@ docker run --rm -d -p 8080:80 --name web webserver
 
 ![novolume](images/novolume.png)
 
+## Connect Microsoft Azure VM
+
+I will make use of a virtual machine in Azure already created in another guide to run the container with the server inside it.
+
+I connect to the Microsoft Azure virtual machine via SSH.
+
+![azure-vm](images/ssh-connection.png)
+
+### Prerequisites
+
+- Docker installed
+- Docker daemon running
+- Azure Virtual Machine created and running
+
+### Upload image into Dockerhub repositories
+
+In order not to have to replicate all the previous steps and recreate a new image, we will upload our image to Dockerhub.
+
+The first thing will be to log in to Dockerhub from the CLI, you will be asked for your credentials Within Dockerhub you will create a repository that will host the image:
+
+```
+docker login
+```
+
+Rename the image with the repository name next to your username:
+
+```
+docker image tag webserver:latest cenicero/nginx-modify:latest
+```
+
+And push the image into the repository:
+
+```
+docker push cenicero/nginx-modify:latest
+```
+
+### Run container from VM
+
+We have our image in Dockerhub, that means we can pull it from everywhere. Let's do it from our virtual machine.
+
+```
+docker pull cenicero/nginx-modify:latest
+```
+
+![cenicero-pull](images/ceniceropull.png)
+
+Run the container:
+
+```
+docker run --rm -d -p 8080:80 --name web cenicero/nginx-modify
+```
+
+If we make a `GET` request with curl from the virtual machine with the container running, we get the `index.html` content.
+
 # Credits
 
 This task is based in a [Docker blog entry](https://www.docker.com/blog/how-to-use-the-official-nginx-docker-image/)
